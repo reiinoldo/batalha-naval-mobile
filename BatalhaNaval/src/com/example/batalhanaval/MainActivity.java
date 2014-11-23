@@ -1,6 +1,12 @@
 package com.example.batalhanaval;
 
+import com.batalhanaval.p2p.WiFiDirectBroadcastReceiver;
+
 import android.app.Activity;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,15 +34,22 @@ public class MainActivity extends Activity {
 	private int qtdBarcos;
 	private int[] posicaoBarcos;
 
+	/* P2P */
+	private WifiP2pManager mManager;
+	private Channel mChannel;
+	private WiFiDirectBroadcastReceiver mReceiver;
+	IntentFilter mIntentFilter;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
+		iniciarWifiP2P();
 
 		rbnv1 = (RadioButton) findViewById(R.id.radio0);
 		rbnv2 = (RadioButton) findViewById(R.id.radio1);
-		rblimpar = (RadioButton) findViewById(R.id.rbt3);
+		// rblimpar = (RadioButton) findViewById(R.id.rbt3);
 
 		posicaoBarcos = new int[3];
 		qtdBarcos = 0;
@@ -122,6 +135,45 @@ public class MainActivity extends Activity {
 				posicionaBarco(ibt9, 9);
 			}
 		});
+		
+		//procurarPares();
+	}
+
+	private void iniciarWifiP2P() {
+		mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+		mChannel = mManager.initialize(this, getMainLooper(), null);
+		mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+
+		mIntentFilter = new IntentFilter();
+		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+	}
+
+	private void procurarPares() {
+		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+			@Override
+			public void onSuccess() {
+				System.out.println("Encontrou algum dispositivo...");
+			}
+			@Override
+			public void onFailure(int reasonCode) {
+				System.out.println("Falha ao encontrar algum dispositivo, Código: "+reasonCode);
+			}
+		});
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		registerReceiver(mReceiver, mIntentFilter);
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		unregisterReceiver(mReceiver);
 	}
 
 	@Override
@@ -149,19 +201,19 @@ public class MainActivity extends Activity {
 			// Recalcular quantos barcos tem na tela
 			qtdBarcos = 0;
 			for (int i = 0; i < posicaoBarcos.length; i++) {
-				if (posicaoBarcos[i] != idButton &&
-					posicaoBarcos[i] > 0) {
+				if (posicaoBarcos[i] != idButton && posicaoBarcos[i] > 0) {
 					posicaoBarcosAux[qtdBarcos] = posicaoBarcos[i];
 					qtdBarcos++;
 				}
 			}
 			posicaoBarcos = posicaoBarcosAux;
-			//Toast.makeText(this, Integer.toString(qtdBarcos), Toast.LENGTH_LONG).show();
-			
+			// Toast.makeText(this, Integer.toString(qtdBarcos),
+			// Toast.LENGTH_LONG).show();
+
 		} else {
-			if(qtdBarcos >= 3)
+			if (qtdBarcos >= 3)
 				return;
-			
+
 			if (rbnv1.isChecked())
 				ibt.setImageResource(R.drawable.ship1);
 			else if (rbnv2.isChecked())
@@ -179,4 +231,5 @@ public class MainActivity extends Activity {
 		}
 		return false;
 	}
+
 }
