@@ -11,11 +11,14 @@ import android.widget.Gallery;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 
 public class MainActivity extends Activity {
 	
 	private LinearLayout ll;
-	private ImageButton ibt1; 
+	private ImageButton ibt1;
+	private RadioButton rbnv1;
+	private RadioButton rbnv2;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,13 +26,18 @@ public class MainActivity extends Activity {
 
 		setContentView(R.layout.activity_main);
 		
+		rbnv1 = (RadioButton) findViewById(R.id.radio0);
+		rbnv2 = (RadioButton) findViewById(R.id.radio1);
+		
 		ibt1 = (ImageButton) findViewById(R.id.ibt1);
 		ibt1.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				ibt1.setImageResource(R.drawable.ship1);
-				
+				if(rbnv1.isSelected())
+					ibt1.setImageResource(R.drawable.ship1);
+				else
+					ibt1.setImageResource(R.drawable.ship2);
 			}
 		});
 //				
