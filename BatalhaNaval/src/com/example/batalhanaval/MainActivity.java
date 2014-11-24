@@ -1,10 +1,15 @@
 package com.example.batalhanaval;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.batalhanaval.p2p.WiFiDirectBroadcastReceiver;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
@@ -12,11 +17,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+@SuppressLint("UseSparseArrays")
 public class MainActivity extends Activity {
 
 	private ImageButton ibt1;
@@ -31,8 +39,13 @@ public class MainActivity extends Activity {
 	private RadioButton rbnv1;
 	private RadioButton rbnv2;
 	private RadioButton rblimpar;
-	private int qtdBarcos;
+	private int qtdBarcos, qtdBarcosOld;
 	private int[] posicaoBarcos;
+	private TextView lbMsg;
+	private Button btExecutar;
+	private Boolean mapaAdversario = false;
+	
+	private Map<ImageButton, Integer> mapAdversario;
 
 	/* P2P */
 	private WifiP2pManager mManager;
@@ -45,14 +58,23 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-		iniciarWifiP2P();
+		//iniciarWifiP2P();
 
 		rbnv1 = (RadioButton) findViewById(R.id.radio0);
 		rbnv2 = (RadioButton) findViewById(R.id.radio1);
 		// rblimpar = (RadioButton) findViewById(R.id.rbt3);
 
 		posicaoBarcos = new int[3];
+//		posicaoBarcosAdversario = new int[9];
+		
 		qtdBarcos = 0;
+		qtdBarcosOld = qtdBarcos;
+		
+		lbMsg = (TextView) findViewById(R.id.lbMsg);
+		lbMsg.setText("");
+		
+		btExecutar = (Button) findViewById(R.id.btExecutar);
+		btExecutar.setEnabled(false); 
 
 		ibt1 = (ImageButton) findViewById(R.id.ibt1);
 		ibt2 = (ImageButton) findViewById(R.id.ibt2);
@@ -136,6 +158,14 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		btExecutar.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				mapaAdversario();				
+			}
+		});
+		
 		//procurarPares();
 	}
 
@@ -167,13 +197,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(mReceiver, mIntentFilter);
+		//registerReceiver(mReceiver, mIntentFilter);
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		unregisterReceiver(mReceiver);
+		//unregisterReceiver(mReceiver);
 	}
 
 	@Override
@@ -193,34 +223,55 @@ public class MainActivity extends Activity {
 
 	private void posicionaBarco(ImageButton ibt, int idButton) {
 
-		if (rblimpar.isChecked()) {
-			ibt.setImageResource(R.drawable.sea);
-
-			int[] posicaoBarcosAux = new int[3];
-
-			// Recalcular quantos barcos tem na tela
-			qtdBarcos = 0;
-			for (int i = 0; i < posicaoBarcos.length; i++) {
-				if (posicaoBarcos[i] != idButton && posicaoBarcos[i] > 0) {
-					posicaoBarcosAux[qtdBarcos] = posicaoBarcos[i];
+		if(!mapaAdversario){
+			//if (rblimpar.checked) {
+			if (false) {
+				ibt.setImageResource(R.drawable.sea);
+	
+				int[] posicaoBarcosAux = new int[3];
+	
+				// Recalcular quantos barcos tem na tela
+				qtdBarcos = 0;
+				for (int i = 0; i < posicaoBarcos.length; i++) {
+					if (posicaoBarcos[i] != idButton && posicaoBarcos[i] > 0) {
+						posicaoBarcosAux[qtdBarcos] = posicaoBarcos[i];
+						qtdBarcos++;
+					}
+				}
+				posicaoBarcos = posicaoBarcosAux;
+				// Toast.makeText(this, Integer.toString(qtdBarcos),
+				// Toast.LENGTH_LONG).show();
+	
+			} else {
+				if (qtdBarcos >= 3){
+					if (!btExecutar.isEnabled()) 
+						btExecutar.setEnabled(true);
+					return;
+					
+				}	
+	
+				if (rbnv1.isChecked())
+					ibt.setImageResource(R.drawable.ship1);
+				else if (rbnv2.isChecked())
+					ibt.setImageResource(R.drawable.ship2);
+	
+				// Evita contagem do mesmo botão
+				if (posicaoBarcos[qtdBarcosOld] != idButton){
+					posicaoBarcos[qtdBarcos] = idButton;
+					qtdBarcosOld = qtdBarcos;
 					qtdBarcos++;
+					lbMsg.setText("Escolhido (" + qtdBarcos + "/3)");
+					if (qtdBarcos == 3)
+						if (!btExecutar.isEnabled()) 
+							btExecutar.setEnabled(true);
 				}
 			}
-			posicaoBarcos = posicaoBarcosAux;
-			// Toast.makeText(this, Integer.toString(qtdBarcos),
-			// Toast.LENGTH_LONG).show();
-
-		} else {
-			if (qtdBarcos >= 3)
-				return;
-
-			if (rbnv1.isChecked())
-				ibt.setImageResource(R.drawable.ship1);
-			else if (rbnv2.isChecked())
-				ibt.setImageResource(R.drawable.ship2);
-
-			posicaoBarcos[qtdBarcos] = idButton;
-			qtdBarcos++;
+		}else{
+			if (acertouBarco(idButton)){
+				ibt.setImageResource(R.drawable.explosion);
+			}else{
+				ibt.setBackgroundColor(Color.GRAY);
+			}
 		}
 	}
 
@@ -230,6 +281,32 @@ public class MainActivity extends Activity {
 				return true;
 		}
 		return false;
+	}
+	
+	public void mapaAdversario(){
+		mapaAdversario = true;
+		mapAdversario = new HashMap<ImageButton, Integer>();
+		
+		mapAdversario.put(ibt1, R.drawable.sea);
+		mapAdversario.put(ibt2, R.drawable.sea);
+		mapAdversario.put(ibt3, R.drawable.sea);
+		mapAdversario.put(ibt4, R.drawable.sea);
+		mapAdversario.put(ibt5, R.drawable.sea);
+		mapAdversario.put(ibt6, R.drawable.sea);
+		mapAdversario.put(ibt7, R.drawable.sea);
+		mapAdversario.put(ibt8, R.drawable.sea);
+		mapAdversario.put(ibt9, R.drawable.sea);
+		
+		setImage(mapAdversario);
+	}
+	
+	public void setImage(Map<ImageButton, Integer> mapa){
+		int idImagem;
+		for (ImageButton ibt: mapa.keySet()){			
+			idImagem = mapa.get(ibt);
+			ibt.setImageResource(idImagem);			
+		}
+		
 	}
 
 }
