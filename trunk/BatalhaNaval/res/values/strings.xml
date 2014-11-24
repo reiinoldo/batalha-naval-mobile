@@ -7,5 +7,6 @@
     <string name="title_activity_mapa">MapaActivity</string>
     <string name="navio1">Navio 1</string>
     <string name="navio2">Navio 2</string>
+    <string name="iniciar">Iniciar</string>
 
 </resources>
