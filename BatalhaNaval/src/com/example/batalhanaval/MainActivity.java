@@ -1,17 +1,12 @@
 package com.example.batalhanaval;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-
-import com.batalhanaval.p2p.WiFiDirectBroadcastReceiver;
+import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.content.IntentFilter;
 import android.graphics.Color;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,13 +14,20 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressLint("UseSparseArrays")
 public class MainActivity extends Activity {
+	
+	/* CAMBIO!
+	 * eai dotores, fiz a parte do funcionamento do jogo sem rede, 
+	 * agora só falta implementar os métodos 'enviarMensagem' e 'receptorMensagem' onde
+	 * o mesmo vai enviar a string para o outro device, e o outro vai receber
+	 * 
+	 * na linha 121, deve ser setado quem é o jogador do device, 1 ou 2
+	 * 
+	 * para simular o jogo sem rede, basta descomentar as linhas 218 e 226...
+	 * Sestari */
 
 	private ImageButton ibt1;
 	private ImageButton ibt2;
@@ -36,162 +38,87 @@ public class MainActivity extends Activity {
 	private ImageButton ibt7;
 	private ImageButton ibt8;
 	private ImageButton ibt9;
-	private RadioButton rbnv1;
-	private RadioButton rbnv2;
-	private RadioButton rblimpar;
-	private int qtdBarcos, qtdBarcosOld;
-	private int[] posicaoBarcos;
+	private HashMap<Integer, Integer> posicaoBarcos;
 	private TextView lbMsg;
+	private TextView lbGeral;
 	private Button btExecutar;
-	private Boolean mapaAdversario = false;
+	private Button btnLimpar;
+	private Jogo jogo;
+	private ArrayList<ImageButton> botoesTela = new ArrayList<ImageButton>();
 	
-	private Map<ImageButton, Integer> mapAdversario;
+	
+	//PADRAO DE MENSAGENS
+	private static String AGUARDANDO_ATAQUE = "AGAT";
+	private static String ATACANDO = "ATCD";
 
-	/* P2P */
-	private WifiP2pManager mManager;
-	private Channel mChannel;
-	private WiFiDirectBroadcastReceiver mReceiver;
-	IntentFilter mIntentFilter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_main);
-		//iniciarWifiP2P();
-
-		rbnv1 = (RadioButton) findViewById(R.id.radio0);
-		rbnv2 = (RadioButton) findViewById(R.id.radio1);
-		// rblimpar = (RadioButton) findViewById(R.id.rbt3);
-
-		posicaoBarcos = new int[3];
-//		posicaoBarcosAdversario = new int[9];
-		
-		qtdBarcos = 0;
-		qtdBarcosOld = qtdBarcos;
+		posicaoBarcos = new HashMap<Integer, Integer>();
 		
 		lbMsg = (TextView) findViewById(R.id.lbMsg);
 		lbMsg.setText("");
+		lbGeral = (TextView) findViewById(R.id.lbGeral);
 		
 		btExecutar = (Button) findViewById(R.id.btExecutar);
 		btExecutar.setEnabled(false); 
-
-		ibt1 = (ImageButton) findViewById(R.id.ibt1);
-		ibt2 = (ImageButton) findViewById(R.id.ibt2);
-		ibt3 = (ImageButton) findViewById(R.id.ibt3);
-		ibt4 = (ImageButton) findViewById(R.id.ibt4);
-		ibt5 = (ImageButton) findViewById(R.id.ibt5);
-		ibt6 = (ImageButton) findViewById(R.id.ibt6);
-		ibt7 = (ImageButton) findViewById(R.id.ibt7);
-		ibt8 = (ImageButton) findViewById(R.id.ibt8);
-		ibt9 = (ImageButton) findViewById(R.id.ibt9);
-
-		ibt1.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt1, 1);
-			}
-		});
-
-		ibt2.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt2, 2);
-			}
-		});
-
-		ibt3.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt3, 3);
-			}
-		});
-
-		ibt4.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt4, 4);
-			}
-		});
-
-		ibt5.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt5, 5);
-			}
-		});
-
-		ibt6.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt6, 6);
-			}
-		});
-
-		ibt7.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt7, 7);
-			}
-		});
-
-		ibt8.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt8, 8);
-			}
-		});
-
-		ibt9.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				posicionaBarco(ibt9, 9);
-			}
-		});
-		
 		btExecutar.setOnClickListener(new OnClickListener() {
-			
 			@Override
 			public void onClick(View arg0) {
-				mapaAdversario();				
+				prepararJogada();				
 			}
 		});
 		
-		//procurarPares();
-	}
-
-	private void iniciarWifiP2P() {
-		mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-		mChannel = mManager.initialize(this, getMainLooper(), null);
-		mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-
-		mIntentFilter = new IntentFilter();
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-	}
-
-	private void procurarPares() {
-		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+		btnLimpar = (Button) findViewById(R.id.btnLimpar);
+		btnLimpar.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onSuccess() {
-				System.out.println("Encontrou algum dispositivo...");
-			}
-			@Override
-			public void onFailure(int reasonCode) {
-				System.out.println("Falha ao encontrar algum dispositivo, Código: "+reasonCode);
+			public void onClick(View v) {
+				limparBotoes();
 			}
 		});
+
+		ibt1 = (ImageButton) findViewById(R.id.ibt1);
+		ibt1.setTag(1);
+		ibt2 = (ImageButton) findViewById(R.id.ibt2);
+		ibt2.setTag(2);
+		ibt3 = (ImageButton) findViewById(R.id.ibt3);
+		ibt3.setTag(3);
+		ibt4 = (ImageButton) findViewById(R.id.ibt4);
+		ibt4.setTag(4);
+		ibt5 = (ImageButton) findViewById(R.id.ibt5);
+		ibt5.setTag(5);
+		ibt6 = (ImageButton) findViewById(R.id.ibt6);
+		ibt6.setTag(6);
+		ibt7 = (ImageButton) findViewById(R.id.ibt7);
+		ibt7.setTag(7);
+		ibt8 = (ImageButton) findViewById(R.id.ibt8);
+		ibt8.setTag(8);
+		ibt9 = (ImageButton) findViewById(R.id.ibt9);
+		ibt9.setTag(9);
+		botoesTela.add(ibt1);
+		botoesTela.add(ibt2);
+		botoesTela.add(ibt3);
+		botoesTela.add(ibt4);
+		botoesTela.add(ibt5);
+		botoesTela.add(ibt6);
+		botoesTela.add(ibt7);
+		botoesTela.add(ibt8);
+		botoesTela.add(ibt9);
+
+		for(final ImageButton btn : botoesTela){
+			btn.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					posicionaBarco(btn, Integer.valueOf(String.valueOf(btn.getTag())));
+				}
+			});
+		}
+		limparBotoes();
+		
+		jogo = new Jogo(this,1); //selecionar quem é o jogador
 	}
 
 	@Override
@@ -220,93 +147,165 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/*
+	 * Metódo que envia a mensagem pra outro aparelho
+	 * 
+	 */
+	public void enviarMensagem(String mensagem){
+		
+	}
+	
+	/*
+	 * Metódo principal para comunicação entre os devices
+	 * 
+	 */
+	public void receptorMensagem(String mensagem){
+		String[] msm = mensagem.split("@#");
+		jogo.posicionarNavios(msm[1], jogo.getJogador() == 1 ? 2 : 1); //seta os navios do jogador adversario
+		
+		if(msm[0].equals(AGUARDANDO_ATAQUE)){
+			jogo.setAtaqueLiberado(true); //outro jogador ja preparou sua defesa
+			if(jogo.isAtaquePreparado()){ //meu ataque está pronto
+				atacar();
+			}
+		}else if(msm[0].equals(ATACANDO)){
+			jogo.verificarResultadoJogada();
+		}
+		
+	}
+	
+	public void atacar(){
+		enviarMensagem(ATACANDO+"@#"+getPosicaoBarcosMensagem()); //vai atacar e enviar a posição dos barcos
+		jogo.verificarResultadoJogada();
+	}
 
-	private void posicionaBarco(ImageButton ibt, int idButton) {
-
-		if(!mapaAdversario){
-			//if (rblimpar.checked) {
-			if (false) {
-				ibt.setImageResource(R.drawable.sea);
+	public void prepararDefesa(){
+		lbGeral.setText("Prepare os seus navios para a desefa!");
+		btExecutar.setText("Defender!");
+		setActivatedBotoes(true);
+		limparBotoes();
+	}
 	
-				int[] posicaoBarcosAux = new int[3];
+	public void preparAtaque(){
+		lbGeral.setText("Prepare o seu ataque...");
+		btExecutar.setText("Atacar!");
+	}
 	
-				// Recalcular quantos barcos tem na tela
-				qtdBarcos = 0;
-				for (int i = 0; i < posicaoBarcos.length; i++) {
-					if (posicaoBarcos[i] != idButton && posicaoBarcos[i] > 0) {
-						posicaoBarcosAux[qtdBarcos] = posicaoBarcos[i];
-						qtdBarcos++;
-					}
-				}
-				posicaoBarcos = posicaoBarcosAux;
-				// Toast.makeText(this, Integer.toString(qtdBarcos),
-				// Toast.LENGTH_LONG).show();
-	
-			} else {
-				if (qtdBarcos >= 3){
-					if (!btExecutar.isEnabled()) 
-						btExecutar.setEnabled(true);
-					return;
-					
-				}	
-	
-				if (rbnv1.isChecked())
-					ibt.setImageResource(R.drawable.ship1);
-				else if (rbnv2.isChecked())
-					ibt.setImageResource(R.drawable.ship2);
-	
-				// Evita contagem do mesmo bot�o
-				if (posicaoBarcos[qtdBarcosOld] != idButton){
-					posicaoBarcos[qtdBarcos] = idButton;
-					qtdBarcosOld = qtdBarcos;
-					qtdBarcos++;
-					lbMsg.setText("Escolhido (" + qtdBarcos + "/3)");
-					if (qtdBarcos == 3)
-						if (!btExecutar.isEnabled()) 
-							btExecutar.setEnabled(true);
-				}
+	public void prepararJogada(){
+		if(jogo.isPartidaPause()){
+			jogo.mudaLadoRodada();
+			limparBotoes();
+			if(jogo.isAtaque()){
+				preparAtaque();
+			}else{
+				prepararDefesa();
 			}
 		}else{
-			if (acertouBarco(idButton)){
-				ibt.setImageResource(R.drawable.explosion);
+			btExecutar.setEnabled(false);
+			jogo.posicionarNavios(getPosicaoBarcosMensagem(), jogo.getJogador()); //seta a posicao dos meus navios
+			
+			if(jogo.isAtaque()){
+				btnLimpar.setEnabled(false);
+				jogo.setAtaquePreparado(true);
+				
+				if(jogo.isAtaqueLiberado()){
+					atacar();
+				}else{
+					lbGeral.setText("Aguardando o outro jogado...");
+					
+					//PARA SIMULAR SEM REDE
+					//receptorMensagem(AGUARDANDO_ATAQUE+"@#1;2;3");  
+				}
 			}else{
-				ibt.setBackgroundColor(Color.GRAY);
+				btnLimpar.setEnabled(false);
+				lbGeral.setText("Aguardando ataque...");
+				enviarMensagem(AGUARDANDO_ATAQUE+"@#"+getPosicaoBarcosMensagem());
+				
+				//PARA SIMULAR SEM REDE
+				//receptorMensagem(ATACANDO+"@#1;2;3"); 
 			}
 		}
 	}
-
-	public boolean acertouBarco(int idBarco) {
-		for (int i = 0; i < posicaoBarcos.length; i++) {
-			if (posicaoBarcos[i] == idBarco)
-				return true;
+	
+	private void setActivatedBotoes(boolean activated){
+		for(ImageButton btn : botoesTela){
+			btn.setEnabled(activated);
 		}
-		return false;
 	}
 	
-	public void mapaAdversario(){
-		mapaAdversario = true;
-		mapAdversario = new HashMap<ImageButton, Integer>();
-		
-		mapAdversario.put(ibt1, R.drawable.sea);
-		mapAdversario.put(ibt2, R.drawable.sea);
-		mapAdversario.put(ibt3, R.drawable.sea);
-		mapAdversario.put(ibt4, R.drawable.sea);
-		mapAdversario.put(ibt5, R.drawable.sea);
-		mapAdversario.put(ibt6, R.drawable.sea);
-		mapAdversario.put(ibt7, R.drawable.sea);
-		mapAdversario.put(ibt8, R.drawable.sea);
-		mapAdversario.put(ibt9, R.drawable.sea);
-		
-		setImage(mapAdversario);
-	}
-	
-	public void setImage(Map<ImageButton, Integer> mapa){
-		int idImagem;
-		for (ImageButton ibt: mapa.keySet()){			
-			idImagem = mapa.get(ibt);
-			ibt.setImageResource(idImagem);			
+	private void limparBotoes(){
+		for(ImageButton btn : botoesTela){
+			btn.setImageResource(R.drawable.sea);
+			btn.setBackgroundColor(Color.TRANSPARENT);
 		}
-		
+		posicaoBarcos.clear();
+		setActivatedBotoes(true);
+		btnLimpar.setEnabled(true);
 	}
 
+	private void posicionaBarco(ImageButton ibt, int idButton) {
+		System.out.println(idButton);
+		if (!posicaoBarcos.containsKey(idButton)){
+			if(jogo.isAtaque()){
+				ibt.setBackgroundColor(Color.GRAY); //seleção
+			}else{
+				ibt.setImageResource(R.drawable.ship1); //navio
+			}
+			posicaoBarcos.put(idButton, 0);
+
+			if (posicaoBarcos.size() == 3){
+				setActivatedBotoes(false);
+				btExecutar.setEnabled(true);
+			}
+		}else{
+			ibt.setImageResource(R.drawable.sea); 
+			posicaoBarcos.remove(idButton);
+		}
+	}
+
+	public void pintarMapaJogada(ArrayList<String> acertos){
+		//desenha o mapa do adversário
+		Set<String> it = jogo.getPosicaoNavios(true).keySet();
+		for(String id : it){
+			for(ImageButton btn : botoesTela){
+				if(String.valueOf(btn.getTag()).equals(id)){
+					if(jogo.isAtaque()){
+						btn.setImageResource(R.drawable.ship2); 
+					}else{
+						btn.setImageResource(R.drawable.explosion);; //onde tentou acertar
+					}
+				}
+			}
+		}
+		
+		//desenha os acertos
+		for(String id : acertos){
+			for(ImageButton btn : botoesTela){
+				if(String.valueOf(btn.getTag()).equals(id)){
+					btn.setImageResource(R.drawable.explosion);
+				}
+			}
+		}
+		String placar = "PLACAR   Você: ";
+		if(jogo.getJogador() == 1){
+			placar += jogo.getPlacarJogador1() + " Adversário: "+jogo.getPlacarJogador2();
+		}else{
+			placar += jogo.getPlacarJogador2() + " Adversário: "+jogo.getPlacarJogador1();
+		}
+		lbMsg.setText(placar);
+		btExecutar.setText("Continuar");
+		btExecutar.setEnabled(true);
+		lbGeral.setText("");
+		jogo.setPartidaPause(true);
+	}
+	
+	public String getPosicaoBarcosMensagem(){
+		String retorno = "";
+		Set<Integer> ff = posicaoBarcos.keySet();
+		for(Integer key : ff){
+			retorno += key+";";
+		}
+		return retorno;
+	}
 }
