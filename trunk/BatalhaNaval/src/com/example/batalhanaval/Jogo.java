@@ -26,11 +26,11 @@ public class Jogo {
 		posicaoNavios[0] = new HashMap<String, Boolean>(); //jogador 1
 		posicaoNavios[1] = new HashMap<String, Boolean>(); //jogador 2
 		
-		if(jogador == 1){
-			activity.preparAtaque();
-		}else{
-			activity.prepararDefesa();
-		}
+//		if(jogador == 1){
+//			activity.preparAtaque();
+//		}else{
+//			activity.prepararDefesa();
+//		}
 	}
 	
 	public void mudaLadoRodada(){

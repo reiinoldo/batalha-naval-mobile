@@ -6,8 +6,10 @@ import java.util.Set;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -143,6 +145,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
+			startActivity(new Intent(MainActivity.this, WiFiDirectActivity.class));
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -212,10 +215,10 @@ public class MainActivity extends Activity {
 				if(jogo.isAtaqueLiberado()){
 					atacar();
 				}else{
-					lbGeral.setText("Aguardando o outro jogado...");
+					lbGeral.setText("Aguardando o outro jogador...");
 					
 					//PARA SIMULAR SEM REDE
-					//receptorMensagem(AGUARDANDO_ATAQUE+"@#1;2;3");  
+					receptorMensagem(AGUARDANDO_ATAQUE+"@#1;2;3");  
 				}
 			}else{
 				btnLimpar.setEnabled(false);
@@ -223,7 +226,7 @@ public class MainActivity extends Activity {
 				enviarMensagem(AGUARDANDO_ATAQUE+"@#"+getPosicaoBarcosMensagem());
 				
 				//PARA SIMULAR SEM REDE
-				//receptorMensagem(ATACANDO+"@#1;2;3"); 
+				receptorMensagem(ATACANDO+"@#1;2;3"); 
 			}
 		}
 	}
