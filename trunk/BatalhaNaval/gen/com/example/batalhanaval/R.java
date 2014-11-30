@@ -22,11 +22,30 @@ public final class R {
         public static final int activity_vertical_margin=0x7f040001;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
+        public static final int explosion=0x7f020000;
+        public static final int ic_launcher=0x7f020001;
+        public static final int sea=0x7f020002;
+        public static final int ship1=0x7f020003;
+        public static final int ship2=0x7f020004;
+        public static final int star_none=0x7f020005;
     }
     public static final class id {
-        public static final int LinearLayout1=0x7f080000;
-        public static final int action_settings=0x7f080001;
+        public static final int GridLayout1=0x7f080000;
+        public static final int LinearLayout1=0x7f08000e;
+        public static final int action_settings=0x7f08000f;
+        public static final int btExecutar=0x7f08000d;
+        public static final int btnLimpar=0x7f08000c;
+        public static final int ibt1=0x7f080001;
+        public static final int ibt2=0x7f080002;
+        public static final int ibt3=0x7f080003;
+        public static final int ibt4=0x7f080004;
+        public static final int ibt5=0x7f080005;
+        public static final int ibt6=0x7f080006;
+        public static final int ibt7=0x7f080007;
+        public static final int ibt8=0x7f080008;
+        public static final int ibt9=0x7f080009;
+        public static final int lbGeral=0x7f08000b;
+        public static final int lbMsg=0x7f08000a;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -40,6 +59,9 @@ public final class R {
         public static final int action_settings=0x7f050002;
         public static final int app_name=0x7f050000;
         public static final int hello_world=0x7f050001;
+        public static final int iniciar=0x7f050006;
+        public static final int navio1=0x7f050004;
+        public static final int navio2=0x7f050005;
         public static final int title_activity_mapa=0x7f050003;
     }
     public static final class style {
