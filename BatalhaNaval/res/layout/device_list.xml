@@ -61,6 +61,7 @@
         android:layout_height="1dp"
         android:gravity="center_vertical"
         android:background="@android:color/holo_blue_light" />
+    
 
     <!-- Available peers -->
     <ListView

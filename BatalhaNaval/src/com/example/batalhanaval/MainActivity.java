@@ -44,6 +44,7 @@ public class MainActivity extends Activity {
 	private TextView lbMsg;
 	private TextView lbGeral;
 	private Button btExecutar;
+	private Button btConectar;	
 	private Button btnLimpar;
 	private Jogo jogo;
 	private ArrayList<ImageButton> botoesTela = new ArrayList<ImageButton>();
@@ -79,6 +80,15 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				limparBotoes();
+			}
+		});
+		
+		btConectar = (Button) findViewById(R.id.btConectar);		 
+		btConectar.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				startActivity(new Intent(MainActivity.this, WiFiDirectActivity.class));
+				btConectar.setEnabled(false);				
 			}
 		});
 

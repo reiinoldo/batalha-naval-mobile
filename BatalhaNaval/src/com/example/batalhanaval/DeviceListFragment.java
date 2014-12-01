@@ -71,17 +71,17 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         Log.d(WiFiDirectActivity.TAG, "Peer status :" + deviceStatus);
         switch (deviceStatus) {
             case WifiP2pDevice.AVAILABLE:
-                return "Available";
+                return "Disponível";
             case WifiP2pDevice.INVITED:
-                return "Invited";
+                return "Convidado";
             case WifiP2pDevice.CONNECTED:
-                return "Connected";
+                return "Conectado";
             case WifiP2pDevice.FAILED:
-                return "Failed";
+                return "Falha";
             case WifiP2pDevice.UNAVAILABLE:
-                return "Unavailable";
+                return "Indisponível";
             default:
-                return "Unknown";
+                return "Desconhecido";
 
         }
     }
@@ -161,7 +161,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         peers.addAll(peerList.getDeviceList());
         ((WiFiPeerListAdapter) getListAdapter()).notifyDataSetChanged();
         if (peers.size() == 0) {
-            Log.d(WiFiDirectActivity.TAG, "No devices found");
+            Log.d(WiFiDirectActivity.TAG, "Nenhum dispositivo encontrado");
             return;
         }
 
@@ -179,7 +179,7 @@ public class DeviceListFragment extends ListFragment implements PeerListListener
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
-        progressDialog = ProgressDialog.show(getActivity(), "Press back to cancel", "finding peers", true,
+        progressDialog = ProgressDialog.show(getActivity(), "Prescione voltar para cancelar", "procurando dispositivos", true,
                 true, new DialogInterface.OnCancelListener() {
 
                     @Override

@@ -12,15 +12,16 @@
     <string name="discover_peers_button">Procurar</string>
     <string name="connect_peer_button">Conectar</string>
     <string name="disconnect_peer_button">Desconectar</string>
-    <string name="get_file_button">Launch Gallery</string>
+    <string name="get_file_button">Enviar mensagem</string>
     <string name="empty"></string>
     <string name="yes">Sim</string>
     <string name="no">Não</string>
-    <string name="client_text">This device will act as a client. Click on Gallery button to pick a local(stored) file</string>
+    <string name="client_text">Este dispositivo é um cliente. Click em enviar uma mensagem</string>
     <string name="empty_message">Nenhum dispositivo foi encontrado. Ligue o P2P e aperte em procurar no menu acima</string>
     <string name="p2p_off_warning">Habilite o P2P pelo menu acima ou pelas configurações do sistema</string>
     <string name="group_owner_text">"Sou o administrador da rede? "</string>
     <string name="label_me">EU</string>
     <string name="label_peers">PEERS</string>
+    <string name="conectar">Conectar</string>
 
 </resources>
