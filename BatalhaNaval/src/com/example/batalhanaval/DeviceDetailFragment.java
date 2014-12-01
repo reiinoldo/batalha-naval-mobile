@@ -114,7 +114,7 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
 
         TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
         statusText.setText("Sending: " + mensagem);
-        Log.i(WiFiDirectActivity.TAG, "Intent----------- " + mensagem);
+        Log.i(WiFiDirectActivity.TAG, "Reinoldo Intent----------- " + mensagem);
         Intent serviceIntent = new Intent(getActivity(), TrocaMensagens.class);
         serviceIntent.setAction(TrocaMensagens.ACTION_SEND_FILE);
         serviceIntent.putExtra(TrocaMensagens.EXTRAS_FILE_PATH, mensagem);
@@ -214,19 +214,20 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         protected String doInBackground(Void... params) {
             try {
                 ServerSocket serverSocket = new ServerSocket(8988);
-                Log.i(WiFiDirectActivity.TAG, "Server: Socket opened");
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Server: Socket opened");
                 Socket client = serverSocket.accept();
-                Log.i(WiFiDirectActivity.TAG, "Server: connection done");
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Server: connection done");
                 
-                Log.i(WiFiDirectActivity.TAG, "Enviando mensagem");
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Enviando mensagem");
                 
-                Log.i(WiFiDirectActivity.TAG, getMessage(client.getInputStream()));
+                String msg = getMessage(client.getInputStream());
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo " + msg );
                 
                 
                 serverSocket.close();
-                return getMessage(client.getInputStream());
+                return msg;
             } catch (IOException e) {
-                Log.e(WiFiDirectActivity.TAG, e.getMessage());
+                Log.e(WiFiDirectActivity.TAG,"Reinoldo " + e.getMessage());
                 return null;
             }
         }
@@ -239,8 +240,9 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         protected void onPostExecute(String result) {
             if (result != null) {
                 statusText.setText("Mensagem recebida - " + result);                
+            }else{
+            	statusText.setText("Mensagem não recebida");
             }
-            statusText.setText("Mensagem não recebida");
         }
 
         /*
@@ -259,11 +261,11 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         String msg = "";        
         try {
             while (inputStream.read(buf) != -1) {                
-                msg += buf;
+                msg += new String(buf, "UTF-8");
             }            
             inputStream.close();
         } catch (IOException e) {
-            Log.i(WiFiDirectActivity.TAG, e.toString());
+            Log.i(WiFiDirectActivity.TAG, "Reinoldo " + e.toString());
             return "fail to get the message";
         }
         return msg;
