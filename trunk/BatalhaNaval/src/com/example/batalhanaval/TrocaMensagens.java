@@ -30,7 +30,7 @@ public class TrocaMensagens extends IntentService{
     protected void onHandleIntent(Intent intent) {	
 		
 
-		Log.i(WiFiDirectActivity.TAG, "onHandrleIntent");
+		Log.i(WiFiDirectActivity.TAG, "Reinoldo onHandrleIntent");
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
             String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
@@ -39,11 +39,11 @@ public class TrocaMensagens extends IntentService{
 
             
             try {
-                Log.i(WiFiDirectActivity.TAG, "Opening client socket - ");
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Opening client socket - ");
                 socket.bind(null);
                 socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
                 
-                Log.i(WiFiDirectActivity.TAG, "Client socket - " + socket.isConnected());
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Client socket - " + socket.isConnected());
                 
                 OutputStream outputStream = socket.getOutputStream();
                                
@@ -51,9 +51,9 @@ public class TrocaMensagens extends IntentService{
                 
                 outputStream.close();                               
                 
-                Log.i(WiFiDirectActivity.TAG, "Client: Data written");
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Client: Data written");
             } catch (IOException e) {
-                Log.e(WiFiDirectActivity.TAG, e.getMessage());
+                Log.e(WiFiDirectActivity.TAG, "Reinoldo " + e.getMessage());
             } finally {
                 if (socket != null) {
                     if (socket.isConnected()) {
@@ -69,7 +69,7 @@ public class TrocaMensagens extends IntentService{
 
             
         }
-        Log.i(WiFiDirectActivity.TAG, "Fim onHandrleIntent");
+        Log.i(WiFiDirectActivity.TAG, "Reinoldo fim onHandrleIntent");
     }
 
 }
