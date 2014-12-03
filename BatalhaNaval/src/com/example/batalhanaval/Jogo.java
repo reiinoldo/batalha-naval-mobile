@@ -11,7 +11,7 @@ public class Jogo {
 	private Integer jogador = 1; //quem é o jogador do device, 1 ou 2
 	private Integer placarJogador1 = 0;
 	private Integer placarJogador2 = 0;
-	private Integer jogadorDeAtaque = 1; //Jogador que está no ataque, 1 ou 2
+	private Integer jogadorDeAtaque = 2; //Jogador que está no ataque, 1 ou 2
 	private MainActivity activity;
 	private boolean ataqueLiberado = false;
 	private boolean ataquePreparado = false;

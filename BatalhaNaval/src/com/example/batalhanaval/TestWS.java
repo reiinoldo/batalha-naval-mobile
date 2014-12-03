@@ -1,6 +1,6 @@
 package com.example.batalhanaval;
 
-import server.cliente.TrocaMensagensService;
+//import server.cliente.TrocaMensagensService;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -35,7 +35,7 @@ public class TestWS extends Activity {
 			@Override
 			public void onClick(View arg0) {				
 				
-				new TrocaMensagensService().getTrocaMensagensPort().sendMessage(lbMsg.getText().toString());
+				//new TrocaMensagensService().getTrocaMensagensPort().sendMessage(lbMsg.getText().toString());
 				
 			}
 		});
@@ -46,7 +46,7 @@ public class TestWS extends Activity {
 
 				
 				
-				lbGeral.setText(new TrocaMensagensService().getTrocaMensagensPort().receiveMessage());
+				//lbGeral.setText(new TrocaMensagensService().getTrocaMensagensPort().receiveMessage());
 				
 			}
 		});
