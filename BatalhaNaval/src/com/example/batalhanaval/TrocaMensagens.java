@@ -1,12 +1,14 @@
 package com.example.batalhanaval;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import android.app.IntentService;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.util.Log;
 
@@ -32,39 +34,57 @@ public class TrocaMensagens extends IntentService{
 
 		Log.i(WiFiDirectActivity.TAG, "Reinoldo onHandrleIntent");
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
-            String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
+            String mensagem = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
-            Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
-
+            
+            Socket socket = new Socket();            
             
             try {
                 Log.i(WiFiDirectActivity.TAG, "Reinoldo Opening client socket - ");
                 socket.bind(null);
-                socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
+                if (!socket.isConnected())
+                	socket.connect((new InetSocketAddress(host, port)), SOCKET_TIMEOUT);
                 
                 Log.i(WiFiDirectActivity.TAG, "Reinoldo Client socket - " + socket.isConnected());
                 
                 OutputStream outputStream = socket.getOutputStream();
                                
-                outputStream.write(fileUri.getBytes());
+                outputStream.write(mensagem.getBytes());
+                outputStream.flush();
                 
-                outputStream.close();                               
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo flush - " + socket.isConnected());
                 
-                Log.i(WiFiDirectActivity.TAG, "Reinoldo Client: Data written");
+                InputStream inputStream = socket.getInputStream();
+                InputStreamReader reader = new InputStreamReader(inputStream);
+                BufferedReader bf = new BufferedReader(reader);
+                
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo read - " + socket.isConnected());
+                String retornoServidor = bf.readLine();
+                //Loop Para Receber Msg
+				while (retornoServidor != null){				
+					retornoServidor = bf.readLine();
+					Log.i(WiFiDirectActivity.TAG, "Reinoldo +-+ " + retornoServidor );
+				}
+				
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo readline - " + socket.isConnected());
+                
+                //outputStream.close();                
+                
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo Client: Data written " + retornoServidor);
             } catch (IOException e) {
                 Log.e(WiFiDirectActivity.TAG, "Reinoldo " + e.getMessage());
             } finally {
-                if (socket != null) {
-                    if (socket.isConnected()) {
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            // Give up
-                            e.printStackTrace();
-                        }
-                    }
-                }
+//                if (socket != null) {
+//                    if (socket.isConnected()) {
+//                        try {
+//                            socket.close();
+//                        } catch (IOException e) {
+//                            // Give up
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                }
             }
 
             
