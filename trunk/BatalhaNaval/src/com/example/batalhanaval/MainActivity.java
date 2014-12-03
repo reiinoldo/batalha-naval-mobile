@@ -2,6 +2,7 @@ package com.example.batalhanaval;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.Set;
 
 import android.annotation.SuppressLint;
@@ -18,6 +19,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("UseSparseArrays")
 public class MainActivity extends Activity {
@@ -195,14 +197,14 @@ public class MainActivity extends Activity {
 	}
 
 	public void prepararDefesa(){
-		lbGeral.setText("Prepare os seus navios para a desefa!");
+		lbGeral.setText("Prepare a sua desefa!");
 		btExecutar.setText("Defender!");
 		setActivatedBotoes(true);
 		limparBotoes();
 	}
 	
 	public void preparAtaque(){
-		lbGeral.setText("Prepare o seu ataque...");
+		lbGeral.setText("Prepare o seu ataque!");
 		btExecutar.setText("Atacar!");
 	}
 	
@@ -227,17 +229,46 @@ public class MainActivity extends Activity {
 					atacar();
 				}else{
 					lbGeral.setText("Aguardando o outro jogador...");
+					String jogada = "@#";
+					Random rand = new Random();
+					
+					for (int i = 0; i < 3; i++) {
+						//retorna um int de 1 a 9
+						int alvo = rand.nextInt((8) + 1) + 1;
+						if(alvo == 0){
+							Toast.makeText(this, "Deu zera essa coisa", Toast.LENGTH_LONG).show();
+						}
+						jogada +=  Integer.toString(alvo) ;
+						if(i < 2){
+							jogada += ";";
+						}
+					}
 					
 					//PARA SIMULAR SEM REDE
-					receptorMensagem(AGUARDANDO_ATAQUE+"@#1;2;3");  
+					receptorMensagem(AGUARDANDO_ATAQUE + jogada);  
 				}
 			}else{
 				btnLimpar.setEnabled(false);
 				lbGeral.setText("Aguardando ataque...");
 				enviarMensagem(AGUARDANDO_ATAQUE+"@#"+getPosicaoBarcosMensagem());
 				
+				String jogada = "@#";
+				Random rand = new Random();
+				
+				for (int i = 0; i < 3; i++) {
+					//retorna um int de 1 a 9
+					int alvo = rand.nextInt((8) + 1) + 1;
+					if(alvo == 0){
+						Toast.makeText(this, "Deu zera essa coisa", Toast.LENGTH_LONG).show();
+					}
+					jogada +=  Integer.toString(alvo) ;
+					if(i < 2){
+						jogada += ";";
+					}
+				}
+				
 				//PARA SIMULAR SEM REDE
-				receptorMensagem(ATACANDO+"@#1;2;3"); 
+				receptorMensagem(ATACANDO + jogada); 
 			}
 		}
 	}
@@ -259,7 +290,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void posicionaBarco(ImageButton ibt, int idButton) {
-		System.out.println(idButton);
+		//System.out.println(idButton);
 		if (!posicaoBarcos.containsKey(idButton)){
 			if(jogo.isAtaque()){
 				ibt.setBackgroundColor(Color.GRAY); //seleção
@@ -302,12 +333,12 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
-		String placar = "PLACAR   Você: ";
-		if(jogo.getJogador() == 1){
-			placar += jogo.getPlacarJogador1() + " Adversário: "+jogo.getPlacarJogador2();
-		}else{
-			placar += jogo.getPlacarJogador2() + " Adversário: "+jogo.getPlacarJogador1();
-		}
+		String placar = "PLACAR   Voc�: ";
+		//if(jogo.getJogador() == 1){
+			placar += jogo.getPlacarJogador1();
+		//}else{
+			placar += "		IA: " + jogo.getPlacarJogador2();
+		//}
 		lbMsg.setText(placar);
 		btExecutar.setText("Continuar");
 		btExecutar.setEnabled(true);
