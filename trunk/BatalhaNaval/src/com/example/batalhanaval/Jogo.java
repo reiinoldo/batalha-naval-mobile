@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import android.media.MediaPlayer;
+
 public class Jogo {
 	
 	private Integer jogador = 1; //quem é o jogador do device, 1 ou 2
@@ -60,6 +62,13 @@ public class Jogo {
 				acertos.add(id);
 			}
 		}
+		
+		if ((acertos.size()!= placarJogador1 && jogador == 1) || 
+			    (acertos.size()!= placarJogador2 && jogador == 2)) {
+				activity.playAcertouAlvo();
+			}else{
+				activity.playErrouAlvo();
+			}
 		
 		if(jogadorDeAtaque == jogador){
 			if(jogador == 1){

@@ -7,7 +7,7 @@
     <string name="title_activity_mapa">MapaActivity</string>
     <string name="navio1">Navio 1</string>
     <string name="navio2">Navio 2</string>
-    <string name="iniciar">Iniciar</string>    
+    <string name="iniciar">Iniciar</string>
     <string name="enable_p2p_button">P2P On/Off</string>
     <string name="discover_peers_button">Procurar</string>
     <string name="connect_peer_button">Conectar</string>
@@ -23,5 +23,6 @@
     <string name="label_me">EU</string>
     <string name="label_peers">PEERS</string>
     <string name="conectar">Conectar</string>
+    <string name="title_activity_test_ws">TestWS</string>
 
 </resources>
