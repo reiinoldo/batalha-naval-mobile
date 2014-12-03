@@ -16,8 +16,11 @@
 
 package com.example.batalhanaval;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -115,13 +118,16 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         TextView statusText = (TextView) mContentView.findViewById(R.id.status_text);
         statusText.setText("Sending: " + mensagem);
         Log.i(WiFiDirectActivity.TAG, "Reinoldo Intent----------- " + mensagem);
+        
         Intent serviceIntent = new Intent(getActivity(), TrocaMensagens.class);
         serviceIntent.setAction(TrocaMensagens.ACTION_SEND_FILE);
         serviceIntent.putExtra(TrocaMensagens.EXTRAS_FILE_PATH, mensagem);
         serviceIntent.putExtra(TrocaMensagens.EXTRAS_GROUP_OWNER_ADDRESS,
                 info.groupOwnerAddress.getHostAddress());
         serviceIntent.putExtra(TrocaMensagens.EXTRAS_GROUP_OWNER_PORT, 8988);
+        
         getActivity().startService(serviceIntent);
+        
     }
 
     @Override
@@ -145,16 +151,16 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         // After the group negotiation, we assign the group owner as the file
         // server. The file server is single threaded, single connection server
         // socket.
-        if (info.groupFormed && info.isGroupOwner) {
+//        if (info.groupFormed && info.isGroupOwner) {
             new FileServerAsyncTask(getActivity(), mContentView.findViewById(R.id.status_text))
                     .execute();
-        } else if (info.groupFormed) {
+//        } else if (info.groupFormed) {
             // The other device acts as the client. In this case, we enable the
             // get file button.
             mContentView.findViewById(R.id.btn_start_client).setVisibility(View.VISIBLE);
             ((TextView) mContentView.findViewById(R.id.status_text)).setText(getResources()
                     .getString(R.string.client_text));
-        }
+//        }
 
         // hide the connect button
         mContentView.findViewById(R.id.btn_connect).setVisibility(View.GONE);
@@ -214,17 +220,41 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
         protected String doInBackground(Void... params) {
             try {
                 ServerSocket serverSocket = new ServerSocket(8988);
+                serverSocket.setReuseAddress(true);
+                
                 Log.i(WiFiDirectActivity.TAG, "Reinoldo Server: Socket opened");
                 Socket client = serverSocket.accept();
                 Log.i(WiFiDirectActivity.TAG, "Reinoldo Server: connection done");
+               
+
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo recebendo mensagem");
+                InputStream inputStream = client.getInputStream();
+                InputStreamReader reader = new InputStreamReader(inputStream);
+                BufferedReader bf = new BufferedReader(reader);
+                String msg = bf.readLine();
                 
-                Log.i(WiFiDirectActivity.TAG, "Reinoldo Enviando mensagem");
+				//Loop Para Receber Msg
+				while (msg != null){				
+					msg = bf.readLine();
+					Log.i(WiFiDirectActivity.TAG, "Reinoldo ++ " + msg );
+				}
                 
-                String msg = getMessage(client.getInputStream());
                 Log.i(WiFiDirectActivity.TAG, "Reinoldo " + msg );
                 
                 
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo closing");
+                OutputStream outputStream = client.getOutputStream();
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo getOutPut" );
+				outputStream.write("chocolate recebido".getBytes());
+				Log.i(WiFiDirectActivity.TAG, "Reinoldo write");
+                
+                Log.i(WiFiDirectActivity.TAG, "Reinoldo close again");
+            
+                
+                outputStream.close();
                 serverSocket.close();
+                
+                
                 return msg;
             } catch (IOException e) {
                 Log.e(WiFiDirectActivity.TAG,"Reinoldo " + e.getMessage());
@@ -257,13 +287,14 @@ public class DeviceDetailFragment extends Fragment implements ConnectionInfoList
     }
 
     public static String getMessage(InputStream inputStream){
+    	Log.i(WiFiDirectActivity.TAG, "Reinoldo getmessage" );
         byte buf[] = new byte[1024];
         String msg = "";        
         try {
             while (inputStream.read(buf) != -1) {                
                 msg += new String(buf, "UTF-8");
             }            
-            inputStream.close();
+            
         } catch (IOException e) {
             Log.i(WiFiDirectActivity.TAG, "Reinoldo " + e.toString());
             return "fail to get the message";

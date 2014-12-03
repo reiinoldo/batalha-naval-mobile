@@ -8,6 +8,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
@@ -276,6 +277,7 @@ public class MainActivity extends Activity {
 			posicaoBarcos.remove(idButton);
 		}
 	}
+	
 
 	public void pintarMapaJogada(ArrayList<String> acertos){
 		//desenha o mapa do adversário
@@ -320,5 +322,15 @@ public class MainActivity extends Activity {
 			retorno += key+";";
 		}
 		return retorno;
+	}
+	
+	public void playAcertouAlvo(){
+		MediaPlayer m = MediaPlayer.create(this,R.raw.win);
+		m.start();
+	}
+	
+	public void playErrouAlvo(){
+		MediaPlayer m = MediaPlayer.create(this,R.raw.lose);
+		m.start();
 	}
 }
