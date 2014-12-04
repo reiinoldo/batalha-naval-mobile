@@ -21,6 +21,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 @SuppressLint("UseSparseArrays")
 public class MainActivity extends Activity {
@@ -213,6 +214,17 @@ public class MainActivity extends Activity {
 	
 	public void prepararJogada(){
 		if(jogo.isPartidaPause()){
+			if(jogo.getPlacarJogador1() >= 10 && jogo.getPlacarJogador1() > jogo.getPlacarJogador2()){
+				Toast.makeText(this, "Parabéns, você venceu!", Toast.LENGTH_LONG).show();
+				inicializaPlacar();
+			} else if(jogo.getPlacarJogador2() >= 10 && jogo.getPlacarJogador2() > jogo.getPlacarJogador1()){
+				Toast.makeText(this, "Lamento, você perdeu!", Toast.LENGTH_LONG).show();
+				inicializaPlacar();
+			} else if(jogo.getPlacarJogador1() >= 10 && jogo.getPlacarJogador2() >= 10){
+				Toast.makeText(this, "Empate!", Toast.LENGTH_LONG).show();
+				inicializaPlacar();
+			}
+			
 			jogo.mudaLadoRodada();
 			limparBotoes();
 			if(jogo.isAtaque()){
@@ -328,13 +340,8 @@ public class MainActivity extends Activity {
 				}
 			}
 		}
-		String placar = "PLACAR   Você: ";
-		//if(jogo.getJogador() == 1){
-			placar += jogo.getPlacarJogador1();
-		//}else{
-			placar += "		IA: " + jogo.getPlacarJogador2();
-		//}
-		lbMsg.setText(placar);
+		
+		lbMsg.setText("PLACAR   Você: " + jogo.getPlacarJogador1() + "		IA: " + jogo.getPlacarJogador2());
 		btExecutar.setText("Continuar");
 		btExecutar.setEnabled(true);
 		lbGeral.setText("");
@@ -358,5 +365,11 @@ public class MainActivity extends Activity {
 	public void playTiro(){
 		MediaPlayer m = MediaPlayer.create(this,R.raw.lose);
 		m.start();
+	}
+	
+	private void inicializaPlacar(){
+		jogo.setPlacarJogador1(0);
+		jogo.setPlacarJogador2(0);
+		lbMsg.setText("PLACAR   Você: " + jogo.getPlacarJogador1() + "		IA: " + jogo.getPlacarJogador2());
 	}
 }
