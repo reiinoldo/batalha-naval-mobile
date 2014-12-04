@@ -47,9 +47,10 @@ public class Jogo {
 		//exemplo mensagem: 1;3;9
 		posicaoNavios[jogador-1] = new HashMap<String, Boolean>();
 		String[] vet = mensagem.split(";");
+		String tam = Integer.toString(vet.length);
 		for(String navio : vet){
 			posicaoNavios[jogador-1].put(navio, true);
-			System.out.println("navio -- "+navio+";jog "+jogador);
+			//System.out.println("navio -- "+navio+";jog "+jogador);
 		}
 	}
 	
@@ -63,12 +64,12 @@ public class Jogo {
 			}
 		}
 		
-		if ((acertos.size()!= placarJogador1 && jogador == 1) || 
-			    (acertos.size()!= placarJogador2 && jogador == 2)) {
-				activity.playAcertouAlvo();
-			}else{
-				activity.playErrouAlvo();
-			}
+		//if ((acertos.size()!= placarJogador1 && jogador == 1) || 
+		//	    (acertos.size()!= placarJogador2 && jogador == 2)) {
+		//		activity.playAcertouAlvo();
+		//	}else{
+				activity.playTiro();
+			//}
 		
 		if(jogadorDeAtaque == jogador){
 			if(jogador == 1){
