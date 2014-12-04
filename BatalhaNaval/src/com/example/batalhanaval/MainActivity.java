@@ -2,6 +2,8 @@ package com.example.batalhanaval;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -19,7 +21,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 @SuppressLint("UseSparseArrays")
 public class MainActivity extends Activity {
@@ -197,8 +198,9 @@ public class MainActivity extends Activity {
 	}
 
 	public void prepararDefesa(){
-		lbGeral.setText("Prepare a sua desefa!");
+		lbGeral.setText("Prepare a sua defesa!");
 		btExecutar.setText("Defender!");
+		btExecutar.setEnabled(false);
 		setActivatedBotoes(true);
 		limparBotoes();
 	}
@@ -206,6 +208,7 @@ public class MainActivity extends Activity {
 	public void preparAtaque(){
 		lbGeral.setText("Prepare o seu ataque!");
 		btExecutar.setText("Atacar!");
+		btExecutar.setEnabled(false);
 	}
 	
 	public void prepararJogada(){
@@ -231,18 +234,14 @@ public class MainActivity extends Activity {
 					lbGeral.setText("Aguardando o outro jogador...");
 					String jogada = "@#";
 					Random rand = new Random();
+					HashSet<Integer> alvos = new HashSet();
+					int alvo;
 					
-					for (int i = 0; i < 3; i++) {
-						//retorna um int de 1 a 9
-						int alvo = rand.nextInt((8) + 1) + 1;
-						if(alvo == 0){
-							Toast.makeText(this, "Deu zera essa coisa", Toast.LENGTH_LONG).show();
-						}
-						jogada +=  Integer.toString(alvo) ;
-						if(i < 2){
-							jogada += ";";
-						}
-					}
+					while(alvos.size() < 3){
+						alvo = rand.nextInt((8) + 1) + 1;
+						if(alvos.add(alvo))
+							jogada +=  Integer.toString(alvo) + ";" ;
+					}					
 					
 					//PARA SIMULAR SEM REDE
 					receptorMensagem(AGUARDANDO_ATAQUE + jogada);  
@@ -254,17 +253,13 @@ public class MainActivity extends Activity {
 				
 				String jogada = "@#";
 				Random rand = new Random();
+				HashSet<Integer> alvos = new HashSet();
+				int alvo;
 				
-				for (int i = 0; i < 3; i++) {
-					//retorna um int de 1 a 9
-					int alvo = rand.nextInt((8) + 1) + 1;
-					if(alvo == 0){
-						Toast.makeText(this, "Deu zera essa coisa", Toast.LENGTH_LONG).show();
-					}
-					jogada +=  Integer.toString(alvo) ;
-					if(i < 2){
-						jogada += ";";
-					}
+				while(alvos.size() < 3){
+					alvo = rand.nextInt((8) + 1) + 1;
+					if(alvos.add(alvo))
+						jogada +=  Integer.toString(alvo) + ";" ;
 				}
 				
 				//PARA SIMULAR SEM REDE
@@ -312,7 +307,7 @@ public class MainActivity extends Activity {
 
 	public void pintarMapaJogada(ArrayList<String> acertos){
 		//desenha o mapa do adversário
-		Set<String> it = jogo.getPosicaoNavios(true).keySet();
+		Set<String> it = jogo.getPosicaoNavios(true).keySet();		
 		for(String id : it){
 			for(ImageButton btn : botoesTela){
 				if(String.valueOf(btn.getTag()).equals(id)){
@@ -355,12 +350,12 @@ public class MainActivity extends Activity {
 		return retorno;
 	}
 	
-	public void playAcertouAlvo(){
+	/*public void playAcertouAlvo(){
 		MediaPlayer m = MediaPlayer.create(this,R.raw.win);
 		m.start();
-	}
+	}*/
 	
-	public void playErrouAlvo(){
+	public void playTiro(){
 		MediaPlayer m = MediaPlayer.create(this,R.raw.lose);
 		m.start();
 	}
